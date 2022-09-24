@@ -169,7 +169,7 @@ class Demographics:
             ph_educ_no_acc = ph_educ_no_acc.replace({'educ': educ_mapping})
 
             # Plot the data
-            fig, ax = plt.subplots(figsize=(9.5,5), dpi=300)
+            fig, ax = plt.subplots(figsize=(9,5), dpi=300)
             
             plot = sns.barplot(
                 x = ph_educ_no_acc['educ'],
@@ -202,7 +202,7 @@ class Demographics:
             ph_gen_no_acc = ph_gen_no_acc.sort_values(by='no_accounts', ascending=False)
 
             # Plot the data
-            fig, ax = plt.subplots(figsize=(8.5,4), dpi=200)
+            fig, ax = plt.subplots(figsize=(9,5), dpi=200)
 
             plot = sns.barplot(
                 x = ph_gen_no_acc['female'],
@@ -231,7 +231,7 @@ class Demographics:
             ph_emp_no_acc = ph_emp_no_acc.replace({'emp_in': emp_mapping})
 
             # Plot the data
-            fig, ax = plt.subplots(figsize=(8.5,4), dpi=200)
+            fig, ax = plt.subplots(figsize=(9,5), dpi=200)
 
             plot = sns.barplot(
                 x = ph_emp_no_acc['emp_in'],
@@ -288,7 +288,7 @@ class Factors_and_Profile:
         df = df.sort_values('percentage_reasons', ascending=False).reset_index()
 
         # Plot the data
-        fig, ax = plt.subplots(figsize=(10,7), dpi=450)
+        fig, ax = plt.subplots(figsize=(9,8), dpi=300)
         plot = sns.barplot(
             x = df['percentage_reasons'],
             y = df['r_labels'],
@@ -347,7 +347,7 @@ class Factors_and_Profile:
         reasons = reasons.sort_values('value', ascending = False)
 
         # Plot the data
-        fig, ax = plt.subplots(figsize=(12,8), dpi=275)
+        fig, ax = plt.subplots(figsize=(4,4), dpi=300)
         plot = sns.barplot(
             x = reasons['value'],
             y = reasons['saving_reason'],
@@ -361,7 +361,7 @@ class Factors_and_Profile:
         ax.set_xlabel("Saving Capacity % per Reason", labelpad=10.0)
         ax.set_ylabel("")
         plt.bar_label(plot.containers[0], fmt='%.2f', padding=7.0)
-        plt.xlim(0, 30)
+        plt.xlim(0, 40)
 
         # Show the data
         st.pyplot(fig)
@@ -378,21 +378,15 @@ class Factors_and_Profile:
             lambda x: 1 if x['borrowed'] == 1 & x['no_accounts'] == 1 else 0, axis = 1
         )
 
-        # Filter for Filipinos who borrowed, have no bank account, and have no need for Financial Services
-        
-        #ph_no_acc_no_needFS['borrowed_no_bank_no_need'] = ph_no_acc_no_needFS.apply(
-        #    lambda x: 1 if x['borrowed_no_bank'] == 1 & x['does_not_have_an_account_bc_no_need_for_financial_services'] == 1 else 0, axis = 1
-        #)
-
         #Filter for where Filipinos borrow
         ph_no_acc_no_needFS['borrowed_from_fi'] = ph_no_acc_no_needFS.apply(
-            lambda x: 1 if x['borrowed_no_bank_no_need'] == 1 & x['fin22a'] == 1 else 0, axis = 1
+            lambda x: 1 if x['borrowed_no_bank'] == 1 & x['fin22a'] == 1 else 0, axis = 1
         )
         ph_no_acc_no_needFS['borrowed_from_family'] = ph_no_acc_no_needFS.apply(
-            lambda x: 1 if x['borrowed_no_bank_no_need'] == 1 & x['fin22b'] == 1 else 0, axis = 1
+            lambda x: 1 if x['borrowed_no_bank'] == 1 & x['fin22b'] == 1 else 0, axis = 1
         )
         ph_no_acc_no_needFS['borrowed_from_informal'] = ph_no_acc_no_needFS.apply(
-            lambda x: 1 if x['borrowed_no_bank_no_need'] == 1 and x['fin22c'] == 1 else 0, axis = 1
+            lambda x: 1 if x['borrowed_no_bank'] == 1 and x['fin22c'] == 1 else 0, axis = 1
         )
 
         # Get borrowed from data only
@@ -419,14 +413,14 @@ class Factors_and_Profile:
         # Plot the data
         fig, ax = plt.subplots(figsize=(6, 3), dpi=200)
         plot = sns.barplot(
-            borrowed_from_df_sorted["Number"],
-            borrowed_from_df_sorted["Borrowed From"],
+            x = borrowed_from_df_sorted["Number"],
+            y = borrowed_from_df_sorted["Borrowed From"],
             color='#C0C0C0'
         )
 
         ax.set_xlabel("Population", labelpad=10.0)
         ax.set_ylabel(" ")
-        plt.bar_label(plot.containers[0], fmt='%.2f', padding=7.0)
+        plt.bar_label(plot.containers[0], fmt='%.2f', padding=3.0)
         plt.xlim(0, 110)
 
 
