@@ -24,6 +24,11 @@ class ProcessData:
         else 0, axis=1
         )
 
+        return philippine_data
+
+    def add_reason_col(data):
+        philippine_data = ProcessData.filter_data(data)
+
         # Create another column for each reason why they don't have bank account
         get_reason(philippine_data, 'r_too_far', 'fin11a')
         get_reason(philippine_data, 'r_too_expensive', 'fin11b')

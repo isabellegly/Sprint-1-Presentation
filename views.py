@@ -107,6 +107,20 @@ class Pages:
         ##### Moreover, members of the middle income category were _receiving domestic remittances_. Thus, bank services were deemed unnecessary.
         """)
 
+        st.markdown("""
+        ##### From the adult Filipinos who said they do not have a bank account because they do not need it, 97% had an account at other financial institutions. Furthermore, 97% of the group also had mobile money accounts.
+        """)
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            Factors_and_Profile.show_mob_acc("Has an account at financial institution?")
+
+        with col2:
+            Factors_and_Profile.show_mob_acc("Has a mobile money account?")
+        
+        st.markdown("_Financial Institutions other than banks might be from insurance industries, investment companies, and money brokers, to name a few. Meanwhile, mobile money accounts or commonly known as e-wallets, are those like GCash, Maya, and Shopee wallets._")
+
         st.subheader("Looking at the bigger picture")
         st.markdown("""
         ##### Here we look at some aspects of the unbanked adult Filipinos in terms of their capacity to save and borrow, as well as their source fo emergency funds.
@@ -253,8 +267,10 @@ class Demographics:
 class Factors_and_Profile:
     
     def show_factors():
+        new_ph_data = data.ProcessData.add_reason_col(ph_data)
+
         # Get the reasons why Filipinos are Unbanked
-        r_ph_data = ph_data[
+        r_ph_data = new_ph_data[
             [
                 'r_too_far',
                 'r_too_expensive',
@@ -280,7 +296,7 @@ class Factors_and_Profile:
 
         # Get total for each reason
         sum_per_reason = r_ph_data.sum()
-        sum_no_accounts = ph_data['no_accounts'].sum()
+        sum_no_accounts = new_ph_data['no_accounts'].sum()
         percentage_reasons = (sum_per_reason*100)/sum_no_accounts
 
         # Assign label to percent value
@@ -347,7 +363,7 @@ class Factors_and_Profile:
         reasons = reasons.sort_values('value', ascending = False)
 
         # Plot the data
-        fig, ax = plt.subplots(figsize=(4,4), dpi=300)
+        fig, ax = plt.subplots(figsize=(6,4), dpi=300)
         plot = sns.barplot(
             x = reasons['value'],
             y = reasons['saving_reason'],
@@ -361,7 +377,7 @@ class Factors_and_Profile:
         ax.set_xlabel("Saving Capacity % per Reason", labelpad=10.0)
         ax.set_ylabel("")
         plt.bar_label(plot.containers[0], fmt='%.2f', padding=7.0)
-        plt.xlim(0, 40)
+        plt.xlim(0, 35)
 
         # Show the data
         st.pyplot(fig)
@@ -429,4 +445,48 @@ class Factors_and_Profile:
 
 
         # Show the data
+        st.pyplot(fig)
+    
+    def show_mob_acc(title):
+
+        # Filter those with accounts who didn't answer 'no need for financial service'
+        no_accounts_no_fin11h = ph_data[ph_data['fin11h']==2]
+
+        #Filter data for fin11h:  no need for financial services and has need for financial services
+        no_accounts_fin11h = ph_data[(ph_data['fin11h']==1)]
+
+        #create a df of no accounts and is fin11h
+        am_fin11h = no_accounts_fin11h.groupby('account_mob')['fin11h'].count().reset_index()
+    
+        #change numerical label to words
+        income_group_mapping = {
+            1.0:'Yes',
+            2.0:'No'
+        }
+
+        am_fin11h.replace({'account_mob':income_group_mapping})
+    
+        # Set figure size
+        fig, ax = plt.subplots(figsize=(9,7)  , dpi=200)
+    
+        clrs = ['#C0C0C0' if (x < max(am_fin11h['fin11h'])) else '#378078' for x in am_fin11h['fin11h'] ]
+    
+        # Run bar plot
+        plot = sns.barplot(
+            x = am_fin11h['account_mob'],
+            y = am_fin11h['fin11h'],
+            palette= clrs
+            
+        )
+        
+        # Set labels
+        ax.set_xlabel(title, labelpad=1.0)
+        ax.set_ylabel('')
+        
+        plot.set(xticklabels=['Yes', 'No'])
+        plot.set(yticklabels=[])
+        plt.bar_label(plot.containers[0], fmt='%.0f', padding=3.0)
+        plt.ylim(0, 250)
+        
+        # Show figure
         st.pyplot(fig)
