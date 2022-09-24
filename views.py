@@ -84,7 +84,7 @@ class Pages:
             """)
             Demographics.show_gender()
 
-    # Page 3 - Factors 
+    # Page 3 - Factors and Profile
     def show_factors_and_profile():
         st.title(
             "Factors why Filipinos are Unbanked"
@@ -149,15 +149,53 @@ class Pages:
         # Emergency Funds
         with tab3:
             st.markdown("""
-            ##### Majority who did not need financial services had emergency funds from work or from family or friends.
-            """)
+            ##### 103 out of 228 unbanked Filipinos who had no need of financial services had a possible source of emergency funds. Among them, 43 Filipinos would rely on their money from working, while 39 Filipinos would rely on their friends or relatives.
 
-    def recommendations():
+            ##### This indicates that majority of Filipinos believe to be always capable in budgeting enough funds for savings. Many other Filipinos strongly trust their family and friends to back them up in case they have insufficient or no funds at all.
+            """)
+            Factors_and_Profile.show_emg_funds()
+
+    # Page 4 - Insights & Reco
+    def show_conclusion():
         # Write the title
         st.title(
-            "What We Can Do"
+            "Key Insights and Recommendations"
         )
-    
+
+        st.subheader("Financial Situation")
+        st.markdown("""
+        ##### _PH is still behind in terms of financial inclusivity as 65% of the adult Filipinos were unbanked, due to the lack of money and bank services were deemed too expensive._
+        """)
+
+        st.subheader("Distance")
+        st.markdown("""
+        ##### _One of the primary factors why Filipinos had no account was that banks were too far from their homes._
+        """)
+
+        st.subheader("Lack of Requirements")
+        st.markdown("""
+        ##### _It was found out that unbanked status partly stemmed from the rigorous process and documentation of banks._
+        """)
+
+        st.subheader("Providing these Filipinos some sources of financial assistance (e.g., cash assistance, pension) and making these financial services more accessible (i.e., locate communities where bank institutions are scarce, reduce steps on setting up accounts) can be the first steps for these Filipinos to improve their financial situation.")
+
+        st.subheader("Education")
+        st.markdown("""
+        ##### _Many unbanked Filipinos had completed education up to the secondary level only._
+        """)
+
+        st.subheader("Mobile Accounts")
+        st.markdown("""
+        ##### _The rise of mobile wallets in the country was transitioning Filipinos to the fintech industry. Hence, the accessibility makes Filipinos favor mobile wallets over traditional bank accounts. To reiterate, 97% of the unbanked had mobile money accounts!_
+        """)
+
+        st.subheader("Trust")
+        st.markdown("""
+        ##### _Majority of Filipinos strongly rely on their family/friends when it comes to borrowing money or to receiving emergency funds. Exposing them to the benefits of savings accounts and/or mutual funds will enable them to secure their savings more effectively._
+        """)
+
+        st.subheader("Implementing mandatory financial literacy classes in high school, will raise Filipinos’ awareness of various available financial services, such as savings accounts, mobile accounts, and mutual funds.")
+
     # Page <insert No.>
     def the_team():
         # Write the title
@@ -447,10 +485,53 @@ class Factors_and_Profile:
         # Show the data
         st.pyplot(fig)
     
-    def show_mob_acc(title):
+    def show_emg_funds():
 
-        # Filter those with accounts who didn't answer 'no need for financial service'
-        no_accounts_no_fin11h = ph_data[ph_data['fin11h']==2]
+        #Clean data according to emergency sources
+        new_ph_data = data.ProcessData.add_reason_col(ph_data)
+        ph_esources_data = new_ph_data[(new_ph_data['no_accounts'] != 0) & new_ph_data['r_no_need_for_fs'] == 1]
+
+        ph_esources_data = ph_esources_data.groupby(['no_accounts','fin25']).agg(total_pop=('wpid_random','count')).reset_index()
+        #Add new percentage column
+        ph_esources_data['%_of_total_pop'] = ph_esources_data['total_pop']*100/sum(ph_esources_data['total_pop'])
+
+        e_reason = {
+        1.0:'Savings',
+        2.0:'Family or friends',
+        3.0:'Money from working',
+        4.0:"Borrowing from a bank, \n employer, or private fund",
+        5.0:'Selling assets',
+        6.0:'Some other source',
+        7.0:'Don\'t know'
+        }
+
+        #Replace float values of 'fin25' into labels
+        ph_esources_data = ph_esources_data.replace({'fin25': e_reason})
+        ph_esources_data = ph_esources_data.sort_values('%_of_total_pop', ascending=False).reset_index()
+
+        #Plot the data
+        fig, ax = plt.subplots(figsize=(6,6), dpi=200)
+        plot = sns.barplot(
+            x = ph_esources_data['%_of_total_pop'],
+            y = ph_esources_data['fin25'],
+            color='#C0C0C0'
+        )
+        
+
+        ax.set_xlabel('Source of Emergency Funds', labelpad=10.0)
+        ax.set_ylabel('Number of Unbanked Filipinos', labelpad=10.0)
+        # Remove clutter
+        ax.set(ylabel=None)
+        plt.bar_label(plot.containers[0], fmt='%.2f', padding=3.0)
+        plt.xlim(0, 50)
+
+        plot.barh([0], [41.75], color='#378078')
+        plot.barh([1], [37.86], color='#378078')
+        
+        # Show the data
+        st.pyplot(fig)
+
+    def show_mob_acc(title):
 
         #Filter data for fin11h:  no need for financial services and has need for financial services
         no_accounts_fin11h = ph_data[(ph_data['fin11h']==1)]
@@ -480,7 +561,7 @@ class Factors_and_Profile:
         )
         
         # Set labels
-        ax.set_xlabel(title, labelpad=1.0)
+        ax.set_xlabel(title, labelpad=10.0)
         ax.set_ylabel('')
         
         plot.set(xticklabels=['Yes', 'No'])
