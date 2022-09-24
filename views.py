@@ -203,7 +203,7 @@ class Pages:
             "The Team"
         )
 
-        st.image("teamwork.jpg", caption='Meet the Team behind Project MabuhAI.')
+        st.image("team_monty_python.jpg", caption='Meet the Team behind Project MabuhAI.')
 
 # Demographics
 class Demographics:
